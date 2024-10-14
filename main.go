@@ -1,7 +1,10 @@
 package main
 
-import "http-client/cli"
+import (
+	"http-client/cli"
+	"os"
+)
 
 func main() {
-	cli.Run()
+	cli.Run(os.Args[1:])
 }
