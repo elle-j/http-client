@@ -1,9 +1,9 @@
 package cli
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"log"
 )
 
 type getCommand struct {
@@ -26,28 +26,30 @@ func getUsage() string {
 	return "TODO USAGE"
 }
 
-func printUsageAndExit() {
-	log.Fatal(getUsage())
-}
-
-func Run(args []string) {
+// Start the CLI.
+func Run(args []string) error {
 	if len(args) < 2 {
-		printUsageAndExit()
+		return errors.New(getUsage())
 	}
 
 	command, url, rounds := newGetCommand()
 
 	if args[0] != command.name {
-		printUsageAndExit()
+		return errors.New(getUsage())
 	}
 
 	command.flags.Parse(args[1:])
 
 	if *url == "" {
-		fmt.Println("You must provide a -url flag with a specific URL.")
-		printUsageAndExit()
+		return errors.New("You must provide a -url flag with a specific URL.\n\n" + getUsage())
 	}
 
-	measures := measureResponseTime(*url, *rounds)
+	measures, err := measureResponseTime(*url, *rounds)
+	if err != nil {
+		return err
+	}
+
 	fmt.Println(measures)
+
+	return nil
 }
