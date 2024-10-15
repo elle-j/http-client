@@ -11,13 +11,13 @@ type getCommand struct {
 	flags *flag.FlagSet
 }
 
-func newGetCommand() (*getCommand, *string, *uint) {
+func newGetCommand() (*getCommand, *string, *int) {
 	command := &getCommand{
 		name:  "get",
 		flags: flag.NewFlagSet("get", flag.ExitOnError),
 	}
 	url := command.flags.String("url", "", "The URL to request (e.g. https://example.com)")
-	rounds := command.flags.Uint("rounds", 1, "The number of rounds/iterations to perform the request")
+	rounds := command.flags.Int("rounds", 1, "The number of rounds/iterations to perform the request")
 
 	return command, url, rounds
 }
@@ -44,12 +44,16 @@ func Run(args []string) error {
 		return errors.New("You must provide a -url flag with a specific URL.\n\n" + getUsage())
 	}
 
-	measures, err := measureResponseTime(*url, *rounds)
+	if *rounds < 1 {
+		return errors.New("If providing -rounds, it must be a positive number.\n\n" + getUsage())
+	}
+
+	measures, err := requestAndMeasure(*url, *rounds)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(measures)
+	fmt.Println(measures.stringify())
 
 	return nil
 }
