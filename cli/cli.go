@@ -13,22 +13,25 @@ type getCommand struct {
 
 const usage = `
 Usage
-  http_client [command] [flags]
+  ./http-client [command] [flags]
 
 Commands
-  get        Make an HTTP GET request and see the response time
+  get        Make HTTP GET requests and see the response times
 
 Flags
-  -url       The URL to request (e.g. https://example.com)
-  -rounds    The number of requests to make when measuring response times (default 1)`
+  -url       The URL to send the request to
+  -rounds    The number of requests to make (default 1)
+
+Example
+  ./http-client -url https://gobyexample.com -rounds 10`
 
 func newGetCommand() (*getCommand, *string, *int) {
 	command := &getCommand{
 		name:  "get",
 		flags: flag.NewFlagSet("get", flag.ContinueOnError),
 	}
-	url := command.flags.String("url", "", "The URL to request (e.g. https://example.com)")
-	rounds := command.flags.Int("rounds", 1, "The number of requests to make when measuring response times")
+	url := command.flags.String("url", "", "The URL to send the request to")
+	rounds := command.flags.Int("rounds", 1, "The number of requests to make")
 
 	return command, url, rounds
 }
