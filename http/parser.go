@@ -23,17 +23,10 @@ func parseScheme(rawUrl string) string {
 	return ""
 }
 
-func isSupportedScheme(scheme string) bool {
-	return scheme == "http" || scheme == "https"
-}
-
 func parseRawUrl(rawUrl string) (*url.URL, error) {
-	scheme := parseScheme(rawUrl)
-	if scheme != "" && !isSupportedScheme(scheme) {
-		return nil, errors.New("only 'http' and 'https' schemes are currently supported")
-	}
-
-	if scheme == "" {
+	explicitScheme := parseScheme(rawUrl)
+	if explicitScheme == "" {
+		// http is assumed if a scheme is not explicitly provided.
 		rawUrl = "http://" + rawUrl
 	}
 

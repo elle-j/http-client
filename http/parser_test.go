@@ -4,12 +4,12 @@ import "testing"
 
 func expectMatch(t *testing.T, name string, actual string, expected string) {
 	if actual != expected {
-		t.Errorf("expected %s to be %s, got %s", name, expected, actual)
+		t.Errorf("expected %s to be '%s', got: %s", name, expected, actual)
 	}
 }
 
 func TestParseRawUrlSuccess(t *testing.T) {
-	type TestExpected struct {
+	type testExpected struct {
 		url    string
 		scheme string
 		host   string
@@ -17,15 +17,15 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		path   string
 	}
 
-	type Test struct {
+	type testCaseSuccess struct {
 		input    string
-		expected TestExpected
+		expected testExpected
 	}
 
-	tests := [...]Test{
+	tests := [...]testCaseSuccess{
 		{
 			input: "gobyexample.com",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "http://gobyexample.com:80/",
 				scheme: "http",
 				host:   "gobyexample.com:80",
@@ -35,7 +35,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "gobyexample.com:80",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "http://gobyexample.com:80/",
 				scheme: "http",
 				host:   "gobyexample.com:80",
@@ -45,7 +45,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "gobyexample.com/goroutines",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "http://gobyexample.com:80/goroutines",
 				scheme: "http",
 				host:   "gobyexample.com:80",
@@ -55,7 +55,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "http://gobyexample.com/goroutines",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "http://gobyexample.com:80/goroutines",
 				scheme: "http",
 				host:   "gobyexample.com:80",
@@ -65,7 +65,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "https://gobyexample.com/goroutines",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "https://gobyexample.com:443/goroutines",
 				scheme: "https",
 				host:   "gobyexample.com:443",
@@ -75,7 +75,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "https://gobyexample.com/#",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "https://gobyexample.com:443/",
 				scheme: "https",
 				host:   "gobyexample.com:443",
@@ -85,7 +85,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "https://gobyexample.com#",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "https://gobyexample.com:443/",
 				scheme: "https",
 				host:   "gobyexample.com:443",
@@ -95,12 +95,62 @@ func TestParseRawUrlSuccess(t *testing.T) {
 		},
 		{
 			input: "https://gobyexample.com/#heading",
-			expected: TestExpected{
+			expected: testExpected{
 				url:    "https://gobyexample.com:443/#heading",
 				scheme: "https",
 				host:   "gobyexample.com:443",
 				port:   "443",
 				path:   "/",
+			},
+		},
+		{
+			input: "localhost:8080",
+			expected: testExpected{
+				url:    "http://localhost:8080/",
+				scheme: "http",
+				host:   "localhost:8080",
+				port:   "8080",
+				path:   "/",
+			},
+		},
+		{
+			input: "127.0.0.1:8080",
+			expected: testExpected{
+				url:    "http://127.0.0.1:8080/",
+				scheme: "http",
+				host:   "127.0.0.1:8080",
+				port:   "8080",
+				path:   "/",
+			},
+		},
+		{
+			input: "postgresql://user:password@localhost/my_database",
+			expected: testExpected{
+				url:    "postgresql://user:password@localhost/my_database",
+				scheme: "postgresql",
+				host:   "localhost",
+				port:   "",
+				path:   "/my_database",
+			},
+		},
+		{
+			input: "postgresql://user:password@localhost:5432/my_database",
+			expected: testExpected{
+				url:    "postgresql://user:password@localhost:5432/my_database",
+				scheme: "postgresql",
+				host:   "localhost:5432",
+				port:   "5432",
+				path:   "/my_database",
+			},
+		},
+		{
+			input: "mongodb://username:password@localhost:27017/my_database",
+			expected: testExpected{
+				url:    "mongodb://username:password@localhost:27017/my_database",
+				scheme: "mongodb",
+				host:   "localhost:27017",
+				port:   "27017",
+				path:   "/my_database",
 			},
 		},
 	}
@@ -122,23 +172,19 @@ func TestParseRawUrlSuccess(t *testing.T) {
 }
 
 func TestParseRawUrlError(t *testing.T) {
-	type TestError struct {
-		input        string
-		errorMessage string
+	type testCaseError struct {
+		input         string
+		expectedError string
 	}
 
-	tests := [...]TestError{
+	tests := [...]testCaseError{
 		{
-			input:        "https://",
-			errorMessage: "provide a host in the URL",
+			input:         "https://",
+			expectedError: "provide a host in the URL",
 		},
 		{
-			input:        "http://",
-			errorMessage: "provide a host in the URL",
-		},
-		{
-			input:        "file://localhost/",
-			errorMessage: "only 'http' and 'https' schemes are currently supported",
+			input:         "http://",
+			expectedError: "provide a host in the URL",
 		},
 	}
 
@@ -147,12 +193,13 @@ func TestParseRawUrlError(t *testing.T) {
 			actualUrl, actualErr := parseRawUrl(test.input)
 
 			if actualErr == nil {
-				t.Errorf("expected error message '%s', got no error", test.errorMessage)
+				t.Errorf("expected error message '%s', got no error", test.expectedError)
+			} else {
+				expectMatch(t, "error message", actualErr.Error(), test.expectedError)
 			}
-			expectMatch(t, "error message", actualErr.Error(), test.errorMessage)
 
 			if actualUrl != nil {
-				t.Errorf("unexpected url, got %s", actualUrl.String())
+				t.Errorf("expected no url, got: %s", actualUrl.String())
 			}
 		})
 	}
