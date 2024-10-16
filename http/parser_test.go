@@ -1,12 +1,9 @@
 package http
 
-import "testing"
-
-func expectMatch(t *testing.T, name string, actual string, expected string) {
-	if actual != expected {
-		t.Errorf("expected %s to be '%s', got: %s", name, expected, actual)
-	}
-}
+import (
+	"http-client/utils"
+	"testing"
+)
 
 func TestParseRawUrlSuccess(t *testing.T) {
 	type testExpected struct {
@@ -182,11 +179,11 @@ func TestParseRawUrlSuccess(t *testing.T) {
 			if err != nil {
 				t.Errorf("expected no error, got: %s", err.Error())
 			}
-			expectMatch(t, "url", actual.String(), test.expected.url)
-			expectMatch(t, "scheme", actual.Scheme, test.expected.scheme)
-			expectMatch(t, "host", actual.Host, test.expected.host)
-			expectMatch(t, "port", actual.Port(), test.expected.port)
-			expectMatch(t, "path", actual.Path, test.expected.path)
+			utils.ExpectMatch(t, "url", actual.String(), test.expected.url)
+			utils.ExpectMatch(t, "scheme", actual.Scheme, test.expected.scheme)
+			utils.ExpectMatch(t, "host", actual.Host, test.expected.host)
+			utils.ExpectMatch(t, "port", actual.Port(), test.expected.port)
+			utils.ExpectMatch(t, "path", actual.Path, test.expected.path)
 		})
 	}
 }
@@ -219,7 +216,7 @@ func TestParseRawUrlError(t *testing.T) {
 			if actualErr == nil {
 				t.Errorf("expected error message to contain '%s', got no error", test.expectedErrorContains)
 			} else {
-				expectContains(t, "error message", actualErr.Error(), test.expectedErrorContains)
+				utils.ExpectContains(t, "error message", actualErr.Error(), test.expectedErrorContains)
 			}
 
 			if actualUrl != nil {

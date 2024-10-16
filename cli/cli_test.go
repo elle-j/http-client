@@ -1,15 +1,10 @@
 package cli
 
 import (
+	"http-client/utils"
 	"strings"
 	"testing"
 )
-
-func expectContains(t *testing.T, name string, actual string, expected string) {
-	if !strings.Contains(actual, expected) {
-		t.Errorf("expected %s to contain '%s', got: %s", name, expected, actual)
-	}
-}
 
 func TestRunSuccess(t *testing.T) {
 	tests := []string{
@@ -86,7 +81,7 @@ func TestRunError(t *testing.T) {
 			if err == nil {
 				t.Errorf("expected error message to contain '%s', got no error", test.expectedErrorContains)
 			} else {
-				expectContains(t, "error message", err.Error(), test.expectedErrorContains)
+				utils.ExpectContains(t, "error message", err.Error(), test.expectedErrorContains)
 			}
 		})
 	}
