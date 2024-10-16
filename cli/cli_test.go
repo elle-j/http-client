@@ -24,58 +24,58 @@ func TestRunSuccess(t *testing.T) {
 			err := Run(strings.Split(command, " "))
 
 			if err != nil {
-				t.Errorf("unexpected error: %s", err.Error())
+				t.Errorf("expected no error, got: %s", err.Error())
 			}
 		})
 	}
 }
 
 func TestRunError(t *testing.T) {
-	type TestError struct {
-		command              string
-		errorMessageContains string
+	type testCaseError struct {
+		command               string
+		expectedErrorContains string
 	}
 
-	tests := []TestError{
+	tests := []testCaseError{
 		{
-			command:              "",
-			errorMessageContains: "Usage",
+			command:               "",
+			expectedErrorContains: "Usage",
 		},
 		{
-			command:              "invalidCommand -invalidFlag",
-			errorMessageContains: "Usage",
+			command:               "invalidCommand -invalidFlag",
+			expectedErrorContains: "Usage",
 		},
 		{
-			command:              "get",
-			errorMessageContains: "Usage",
+			command:               "get",
+			expectedErrorContains: "Usage",
 		},
 		{
-			command:              "get -invalidFlag",
-			errorMessageContains: "flag provided but not defined: -invalidFlag",
+			command:               "get -invalidFlag",
+			expectedErrorContains: "flag provided but not defined: -invalidFlag",
 		},
 		{
-			command:              "get -url",
-			errorMessageContains: "flag needs an argument: -url",
+			command:               "get -url",
+			expectedErrorContains: "flag needs an argument: -url",
 		},
 		{
-			command:              "get -url ",
-			errorMessageContains: "you must provide a -url flag with a specific URL",
+			command:               "get -url ",
+			expectedErrorContains: "you must provide a -url flag with a specific URL",
 		},
 		{
-			command:              "get -url https://gobyexample.com/ -rounds",
-			errorMessageContains: "flag needs an argument: -rounds",
+			command:               "get -url https://gobyexample.com/ -rounds",
+			expectedErrorContains: "flag needs an argument: -rounds",
 		},
 		{
-			command:              "get -url https://gobyexample.com/ -rounds -1",
-			errorMessageContains: "if providing -rounds, it must be a positive integer",
+			command:               "get -url https://gobyexample.com/ -rounds -1",
+			expectedErrorContains: "if providing -rounds, it must be a positive integer",
 		},
 		{
-			command:              "get -url https://gobyexample.com/ -rounds 2.5",
-			errorMessageContains: "invalid value \"2.5\" for flag -rounds: parse error",
+			command:               "get -url https://gobyexample.com/ -rounds 2.5",
+			expectedErrorContains: "invalid value \"2.5\" for flag -rounds: parse error",
 		},
 		{
-			command:              "get -url https://gobyexample.com/ -rounds not_a_number",
-			errorMessageContains: "invalid value \"not_a_number\" for flag -rounds: parse error",
+			command:               "get -url https://gobyexample.com/ -rounds not_a_number",
+			expectedErrorContains: "invalid value \"not_a_number\" for flag -rounds: parse error",
 		},
 	}
 
@@ -84,9 +84,10 @@ func TestRunError(t *testing.T) {
 			err := Run(strings.Split(test.command, " "))
 
 			if err == nil {
-				t.Errorf("expected error message to contain '%s', got no error", test.errorMessageContains)
+				t.Errorf("expected error message to contain '%s', got no error", test.expectedErrorContains)
+			} else {
+				expectContains(t, "error message", err.Error(), test.expectedErrorContains)
 			}
-			expectContains(t, "error message", err.Error(), test.errorMessageContains)
 		})
 	}
 }
