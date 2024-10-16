@@ -153,6 +153,26 @@ func TestParseRawUrlSuccess(t *testing.T) {
 				path:   "/my_database",
 			},
 		},
+		{
+			input: " localhost:8080    ",
+			expected: testExpected{
+				url:    "http://localhost:8080/",
+				scheme: "http",
+				host:   "localhost:8080",
+				port:   "8080",
+				path:   "/",
+			},
+		},
+		{
+			input: "\tlocalhost:8080\t\t",
+			expected: testExpected{
+				url:    "http://localhost:8080/",
+				scheme: "http",
+				host:   "localhost:8080",
+				port:   "8080",
+				path:   "/",
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -160,7 +180,7 @@ func TestParseRawUrlSuccess(t *testing.T) {
 			actual, err := parseRawUrl(test.input)
 
 			if err != nil {
-				t.Errorf("unexpected error: %s", err.Error())
+				t.Errorf("expected no error, got: %s", err.Error())
 			}
 			expectMatch(t, "url", actual.String(), test.expected.url)
 			expectMatch(t, "scheme", actual.Scheme, test.expected.scheme)
@@ -173,18 +193,22 @@ func TestParseRawUrlSuccess(t *testing.T) {
 
 func TestParseRawUrlError(t *testing.T) {
 	type testCaseError struct {
-		input         string
-		expectedError string
+		input                 string
+		expectedErrorContains string
 	}
 
 	tests := [...]testCaseError{
 		{
-			input:         "https://",
-			expectedError: "provide a host in the URL",
+			input:                 "https://",
+			expectedErrorContains: "provide a host in the URL",
 		},
 		{
-			input:         "http://",
-			expectedError: "provide a host in the URL",
+			input:                 "http://",
+			expectedErrorContains: "provide a host in the URL",
+		},
+		{
+			input:                 "http://localhost:invalidPort",
+			expectedErrorContains: "invalid port \":invalidPort\" after host",
 		},
 	}
 
@@ -193,9 +217,9 @@ func TestParseRawUrlError(t *testing.T) {
 			actualUrl, actualErr := parseRawUrl(test.input)
 
 			if actualErr == nil {
-				t.Errorf("expected error message '%s', got no error", test.expectedError)
+				t.Errorf("expected error message to contain '%s', got no error", test.expectedErrorContains)
 			} else {
-				expectMatch(t, "error message", actualErr.Error(), test.expectedError)
+				expectContains(t, "error message", actualErr.Error(), test.expectedErrorContains)
 			}
 
 			if actualUrl != nil {

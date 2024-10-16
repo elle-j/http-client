@@ -24,6 +24,8 @@ func parseScheme(rawUrl string) string {
 }
 
 func parseRawUrl(rawUrl string) (*url.URL, error) {
+	rawUrl = strings.TrimSpace(rawUrl)
+
 	explicitScheme := parseScheme(rawUrl)
 	if explicitScheme == "" {
 		// http is assumed if a scheme is not explicitly provided.
