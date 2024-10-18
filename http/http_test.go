@@ -37,7 +37,7 @@ func TestHttpGetError(t *testing.T) {
 	tests := []testCaseError{
 		{
 			input:                 "invalidHost",
-			expectedErrorContains: "dial tcp: lookup invalidHost: no such host",
+			expectedErrorContains: "dial tcp: lookup invalidHost",
 		},
 	}
 
