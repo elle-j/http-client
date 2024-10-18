@@ -30,7 +30,7 @@ Flags
   -rounds    The number of requests to make (default 1)
 
 Example
-  ./http-client -url https://gobyexample.com -rounds 10
+  ./http-client get -url https://gobyexample.com -rounds 10
 ```
 
 ### Example Input and Output
@@ -77,16 +77,16 @@ Median time: 49.7726ms
 
 #### Response Time
 
-Note that the response time for each request includes:
-* Parsing the raw URL
-* Connecting to the network address
-  * For TLS connections, this includes a TLS handshake
-* Writing to the connection (sending your request)
-* Reading from the connection (retrieving the response)
+* Note that the response time for each request includes:
+  * Parsing the raw URL
+  * Connecting to the network address
+    * For TLS connections, this includes a TLS handshake
+  * Writing to the connection (sending your request)
+  * Reading from the connection (retrieving the response)
 
 #### Raw URL
 
-If the provided URL does not explicitly contain a [scheme](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes) (e.g. prefixed with `https://`), then `http` is assumed.
+* If the provided URL does not explicitly contain a [scheme](https://developer.mozilla.org/en-US/docs/Web/URI/Schemes) (e.g. prefixed with `https://`), then `http` is assumed.
 
 ## Getting Started
 

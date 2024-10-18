@@ -23,7 +23,7 @@ Flags
   -rounds    The number of requests to make (default 1)
 
 Example
-  ./http-client -url https://gobyexample.com -rounds 10`
+  ./http-client get -url https://gobyexample.com -rounds 10`
 
 func newGetCommand() (*getCommand, *string, *int) {
 	command := &getCommand{
