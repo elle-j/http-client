@@ -55,11 +55,20 @@ func calculateSum(durations []time.Duration) time.Duration {
 }
 
 func calculateMean(durations []time.Duration) time.Duration {
-	return calculateSum(durations) / time.Duration(len(durations))
+	count := len(durations)
+	if count == 0 {
+		return 0
+	}
+
+	return calculateSum(durations) / time.Duration(count)
 }
 
 func calculateMedian(sortedDurations []time.Duration) time.Duration {
 	count := len(sortedDurations)
+	if count == 0 {
+		return 0
+	}
+
 	midIndex := count / 2
 	median := sortedDurations[midIndex]
 	if count%2 == 0 {
