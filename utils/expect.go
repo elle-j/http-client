@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func ExpectMatch(t *testing.T, name string, actual string, expected string) {
+func ExpectMatch[T comparable](t *testing.T, name string, actual T, expected T) {
 	if actual != expected {
-		t.Errorf("expected %s to be '%s', got: %s", name, expected, actual)
+		t.Errorf("expected %s to be '%v', got: %v", name, expected, actual)
 	}
 }
 
